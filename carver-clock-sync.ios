@@ -1,0 +1,14 @@
+! Set up the authorization bypass environment
+event manager environment _cron_entry "0-59/1 * * * *"
+event manager environment _show_cmd "show clock"
+
+! Main EEM applet triggered on system restart
+event manager applet SET-DATE-AT-BOOT authorization bypass
+ event syslog pattern ".*%SYS-5-RESTART: System restarted.*" maxrun 60
+ action 0010 cli command "enable"
+ action 0020 syslog msg "Setting system date to October 2, 2025"
+ action 0030 cli command "configure terminal" pattern ".*"
+ action 0040 cli command "end" pattern ".*"
+ action 0050 cli command "enable"
+ action 0060 cli command "clock set 12:00:00 Oct 2 2025" pattern ".*"
+ action 0070 syslog msg "Date has been set to October 2, 2025"
